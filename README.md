@@ -237,25 +237,24 @@ En el testbench se configuró el parámetro CLKS_PER_BIT = 8 (con un periodo de 
 ![Simulación Ejercicio 3](doc/sim_ejercicio33.png)
 
 
-#### Análisis Cronológico del Comportamiento
+#### Análisis del Comportamiento
 
 1. Inicialización y Reset:
-   * Al inicio, la señal rst se activa durante 2 ciclos. La FSM se inicializa en el estado IDLE (`state = 0`), manteniendo busy = 0, done = 0 y la línea serial en reposo (`tx = 1`).
+   * En principio, la señal rst se activa durante 2 ciclos. La FSM se inicializa en el estado IDLE (`state = 0`), manteniendo busy = 0, done = 0 y la línea serial en reposo (`tx = 1`).
 
-2. Transmisión 1: Dato 8'hA5 (`10100101` en binario):
-   * Carga: Al detectarse el pulso de 1 ciclo en start, el sistema conmuta brevemente a LOAD (`state = 1`), cargando shift_reg = A5 y activando busy = 1.
+2. Transmisión 1: Dato `10100101`:
+   * Carga: Al detectarse el pulso de 1 ciclo en start, el sistema conmuta brevemente a LOAD (`state = 1`), cargando shift_reg = `10100101` y activando busy = 1.
    * Envío Bit a Bit (LSB Primero): 
-     * Bit 0 (`1`): tx toma el valor `1` y permanece estable durante $8 \text{ ciclos}$ ($80\text{ ns}$) impulsado por tick_cnt (conteo de `0` a `7`). Al completarse, shift_reg se desplaza a la derecha convirtiéndose en `52` y bit_count se incrementa a `1`.
-     * Bits 1 a 7: La secuencia continúa enviando los bits `0`, `1`, `0`, `0`, `1`, `0` y `1` (correspondientes al desplazamiento sucesivo en shift_reg: `52` $\rightarrow$ `29` $\rightarrow$ `14` $\rightarrow$ `0A` $\rightarrow$ `05` $\rightarrow$ `02` $\rightarrow$ `01`).
+     * Bit 0 (`1`): tx toma el valor `1` y permanece estable durante $8 \text{ ciclos}$ ($80\text{ ns}$)  por tick_cnt (conteo de `0` a `7`). Al completarse, shift_reg se desplaza a la derecha convirtiéndose en `01010010` y bit_count se incrementa a `1`.
+     * Bits 1 a 7: La secuencia continúa enviando los bits `0`, `1`, `0`, `0`, `1`, `0` y `1` (correspondientes al desplazamiento sucesivo en shift_reg: `01010010` $\rightarrow$ `00101001` $\rightarrow$ `00010100` $\rightarrow$ `00001010` $\rightarrow$ `00000101` $\rightarrow$ `00000010` $\rightarrow$ `00000001`).
    * Finalización: Tras transmitir los 8 bits (`bit_count == 7`), la FSM entra al estado DONE (`state = 4`), donde emite un pulso de done de exactamente 1 ciclo de reloj y desactiva busy = 0.
 
-3. Transmisión 2: Dato 8'h3C (`00111100` en binario):
-   * Tras retornar a IDLE, un nuevo pulso de start inicia la transmisión de 8'h3C.
-   * El registro se desplaza secuencialmente (`3C` $\rightarrow$ `1E` $\rightarrow$ `0F` $\rightarrow$ `07` $\rightarrow$ `03` $\rightarrow$ `01` $\rightarrow$ `00`), enviando los bits desde el LSB (`0`) hasta el MSB (`0`), manteniendo cada bit por 8 ciclos exactos de reloj.
+3. Transmisión 2: Dato `00111100`:
+   * Tras retornar a IDLE, un nuevo pulso de start inicia la transmisión de `00111100`.
+   * El registro se desplaza secuencialmente (`00111100` $\rightarrow$ `00011110` $\rightarrow$ `00001111` $\rightarrow$ `00000111` $\rightarrow$ `00000011` $\rightarrow$ `00000001` $\rightarrow$ `00000000`), enviando los bits desde el LSB (`0`) hasta el MSB (`0`), manteniendo cada bit por 8 ciclos exactos de reloj.
    * La transmisión concluye correctamente generando de nuevo el pulso de done = 1 por 1 ciclo.
 
 
-j
 
 ---
 
