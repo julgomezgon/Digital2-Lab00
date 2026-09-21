@@ -4,7 +4,7 @@
 **Integrantes:**  
 * Julian David Gomez Gonzalez
 * Cristian Norbey Hernández Gualteros
-* Integrante 2 
+* Milton Nicolas Rincón Caicedo
 
 ---
 
@@ -94,7 +94,7 @@ La secuencia observada en GTKWave es:
 
 y posteriormente vuelve a repetirse.
 
-El contador interno permite verificar la duración de cada estado. Por ejemplo, mientras la FSM se encuentra en **S2**, la señal `red` permanece en `1` mientras el contador avanza hasta completar los 4 ciclos correspondientes. Al alcanzar el límite, la FSM cambia al estado **S3**, `red` pasa a `0` y `yellow` pasa a `1`.
+El contador interno permite verificar la duración de cada estado. Por ejemplo, mientras la FSM se encuentra en **S2**, la señal `red` permanece en `1` mientras el contador avanza hasta completar los 4 ciclos correspondientes. Al alcanzar el límite de 4 ciclos, la FSM cambia al estado **S3**, `red` pasa a `0` y `yellow` pasa a `1`.
 
 De esta manera, la simulación confirma que la FSM realiza correctamente las transiciones programadas y que solamente una de las tres luces permanece activa en cada estado.
 
