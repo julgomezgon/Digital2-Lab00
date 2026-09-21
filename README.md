@@ -203,7 +203,6 @@ Síncrono
 <!-- Imagen de GTKWave del Ejercicio 3 -->
 ![Simulación Ejercicio 3](doc/sim_ejercicio3.png)
 
-<!-- Análisis de los bytes transmitidos y duración de bits -->
 
 ---
 
@@ -213,4 +212,13 @@ Síncrono
 ---
 
 ## 5. Conclusiones
-<!-- Conclusiones técnicas del laboratorio -->
+
+* **Separación de Control y Ruta de Datos (FSM + Datapath):** Se demostró que separar la máquina de estados finitos de los elementos aritméticos y de almacenamiento simplifica el diseño de sistemas secuenciales complejos. Mientras la FSM se encarga únicamente de dirigir el flujo temporal y de validar condiciones lógicas (`start`, criterios de parada, `cancel`), el datapath realiza las transferencias entre registros (`acc`, contadores) de forma determinista y predecible.
+
+* **Sincronización y Naturaleza de la Lógica Secuencial:** A diferencia de los circuitos puramente combinacionales donde las salidas cambian inmediatamente con las entradas, la sincronización por flancos de subida del reloj (`posedge clk`) permitió coordinar operaciones multi-ciclo. Esto fue esencial para mantener la temporización estricta de cada luz en el semáforo vehicular y para la acumulación paso a paso en el acumulador.
+
+* **Precisión Temporal y Generación de Señales de Control:** A través de las simulaciones se mostró la importancia de diseñar señales de estatus como pulsos de duración exacta. En el acumulador, la señal `done` se activó durante exactamente un ciclo de reloj al terminar el cálculo, garantizando una interfaz de comunicación segura con otros módulos y evitando falsos disparos.
+
+* **Mecanismos de Cancelación e Inicialización Segura:** La inclusión de señales como `rst` y `cancel` demostró ser fundamental para la robustez del hardware. Se validó que una condición de interrupción en pleno cómputo devuelve la FSM al estado `IDLE`, reinicia los acumuladores y suprime la bandera `done`, asegurando que el sistema no propague datos inconsistentes.
+
+* **Importancia de la Verificación con Icarus Verilog y GTKWave:** La simulación temporal mediante bancos de pruebas (*testbenches*) permitió rastrear el comportamiento interno ciclo a ciclo, facilitando la detección de condiciones de carrera, errores de conteo y verificación de estados internos antes de una eventual implementación en hardware físico.
