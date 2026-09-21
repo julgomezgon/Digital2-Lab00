@@ -229,10 +229,9 @@ La máquina de estados finitos sigue el flujo algorítmico estructurado en los s
 
 ### 4.3 Simulación y Análisis de Transmisión
 
-
 Para validar el funcionamiento del transmisor serial síncrono, se ejecutó la simulación en Icarus Verilog y se analizaron las formas de onda resultantes en GTKWave. 
 
-En el testbench se configuró el parámetro CLKS_PER_BIT = 8 (con un periodo de reloj de  $T_{clk} = 10\text{ ns}$) y se evaluó la transmisión secuencial de dos datos de prueba: 8'hA5 y 8'h3C (10100101 y 00111100)
+En el testbench se configuró el parámetro `CLKS_PER_BIT = 8` (con un periodo de reloj de $T_{clk} = 10\text{ ns}$) y se evaluó la transmisión secuencial de dos datos de prueba: `8'hA5` y `8'h3C` (`10100101` y `00111100`).
 
 ![Simulación Ejercicio 3](doc/sim_ejercicio33.png)
 
