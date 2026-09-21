@@ -50,9 +50,8 @@ Para controlar la duración de cada estado se utiliza un contador interno que cu
 
 ### 2.2 Diagrama de Estados (FSM)
 
-<p align="center">
-  <img src="doc/fsm_semaforo.png" width="700">
-</p>
+  <img src="doc/fsm_semaforo.png" width="600">
+
 
 El diagrama representa los cuatro estados de la FSM y las transiciones entre ellos.
 
