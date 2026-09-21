@@ -234,7 +234,7 @@ Para validar el funcionamiento del transmisor serial síncrono, se ejecutó la s
 
 En el testbench se configuró el parámetro CLKS_PER_BIT = 8 (con un periodo de reloj de  $T_{clk} = 10\text{ ns}$) y se evaluó la transmisión secuencial de dos datos de prueba: 8'hA5 y 8'h3C (10100101 y 00111100)
 
-![Simulación Ejercicio 3](doc/sim_ejercicio3.png)
+![Simulación Ejercicio 3](doc/sim_ejercicio33.png)
 
 
 #### Análisis Cronológico del Comportamiento
