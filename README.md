@@ -240,25 +240,28 @@ En el testbench se configuró el parámetro CLKS_PER_BIT = 8 (con un periodo de 
 #### Análisis del Comportamiento
 
 1. Inicialización y Reset:
-   * En principio, la señal rst se activa durante 2 ciclos. La FSM se inicializa en el estado IDLE (`state = 0`), manteniendo busy = 0, done = 0 y la línea serial en reposo (`tx = 1`).
+   * En principio, la señal `rst` se activa durante 2 ciclos. La FSM se inicializa en el estado `IDLE` (`state = 0`), manteniendo `busy = 0`, `done = 0` y la línea serial en reposo (`tx = 1`).
 
-2. Transmisión 1: Dato `10100101`:
-   * Carga: Al detectarse el pulso de 1 ciclo en start, el sistema conmuta brevemente a LOAD (`state = 1`), cargando shift_reg = `10100101` y activando busy = 1.
+2. Transmisión 1 Dato `10100101`:
+   * Carga: Al detectarse el pulso de 1 ciclo en `start`, el sistema conmuta a `LOAD` (`state = 1`), cargando `shift_reg = 10100101`, reiniciando los contadores (`bit_count = 0`, `tick_cnt = 0`) y activando `busy = 1`.
      
-   * Envío Bit a Bit (LSB Primero): 
-     * Primer Bit (`1`): tx toma el valor `1` y permanece estable durante $8 \text{ ciclos}$ ($80\text{ ns}$)  por tick_cnt (conteo de `0` a `7`). Al completarse, shift_reg se desplaza a la derecha convirtiéndose en `01010010` y bit_count se incrementa a `1`.
-     * Bits 1 a 7: La secuencia continúa enviando los bits `0`, `1`, `0`, `0`, `1`, `0` y `1` correspondientes al desplazamiento sucesivo en shift_reg: `01010010` $\rightarrow$ `00101001` $\rightarrow$ `00010100` $\rightarrow$ `00001010` $\rightarrow$ `00000101` $\rightarrow$ `00000010` $\rightarrow$ `00000001`.
+   * Envío Bit a Bit (LSB Primero):
+     * Primer Bit (`1`): La FSM pasa al estado `BIT_HOLD` (`state = 2`). La salida `tx` toma el valor `1` del bit LSB (`shift_reg[0]`) y se mantiene estable durante exactamente 8 ciclos de reloj (80 ns), controlados por `tick_cnt` contando de `0` a `7`.
        
-   * Finalización: Tras transmitir los 8 bits (`bit_count == 7`), la FSM entra al estado DONE (`state = 4`), donde emite un pulso de done de exactamente 1 ciclo de reloj y desactiva busy = 0.
+     * Siguiente Bit y Desplazamientos : Al llegar `tick_cnt = 7`, el sistema conmuta a `SHIFT_NEXT` (`state = 3`), donde `shift_reg` se desplaza a la derecha convirtiéndose en `01010010`, `bit_count` se incrementa a `1` y `tick_cnt` se reinicia a `0` para regresar a `BIT_HOLD` (`state = 2`).
+       
+     * Bits 1 a 7: La secuencia de estados entre `BIT_HOLD` (`state = 2`) y `SHIFT_NEXT` (`state = 3`) se repite iterativamente enviando los bits `0`, `1`, `0`, `0`, `1`, `0` y `1`. Esto se refleja en el desplazamiento progresivo de `shift_reg`: `01010010` → `00101001` → `00010100` → `00001010` → `00000101` → `00000010` → `00000001`, mientras `bit_count` se incrementa en cada paso hasta llegar a `7`.
+       
+   * Finalización: Tras transmitir el último bit (`bit_count == 7` en `SHIFT_NEXT`), la FSM entra al estado `DONE` (`state = 4`), donde emite un pulso de `done = 1` de exactamente 1 ciclo de reloj, desactiva `busy = 0` y retorna al estado `IDLE` (`state = 0`).
 
-3. Transmisión 2: Dato `00111100`:
-   * Tras retornar a IDLE, un nuevo pulso de start inicia la transmisión de `00111100`.
+3. Transmisión 2 Dato `00111100`:
+   * Tras retornar a `IDLE` (`state = 0`), un nuevo pulso de `start` conmuta a `LOAD` (`state = 1`) para iniciar la transmisión de `00111100`.
      
-   * El registro se desplaza secuencialmente (`00111100` $\rightarrow$ `00011110` $\rightarrow$ `00001111` $\rightarrow$ `00000111` $\rightarrow$ `00000011` $\rightarrow$ `00000001` $\rightarrow$ `00000000`), enviando los bits desde el LSB (`0`) hasta el MSB (`0`), manteniendo cada bit por 8 ciclos exactos de reloj.
+   * El sistema recorre nuevamente la secuencia de estados `BIT_HOLD` (`state = 2`) y `SHIFT_NEXT` (`state = 3`). El registro se desplaza secuencialmente (`00111100` → `00011110` → `00001111` → `00000111` → `00000011` → `00000001` → `00000000`), enviando los bits desde el LSB (`0`) hasta el MSB (`0`).
      
-   * La transmisión concluye correctamente generando de nuevo el pulso de done = 1 por 1 ciclo.
-
-
+   * Cada bit mantiene su duración exacta de 8 ciclos de reloj (80 ns) medida por `tick_cnt`.
+     
+   * La transmisión concluye al pasar por `DONE` (`state = 4`), generando el pulso de `done = 1` por 1 ciclo  y desactivando `busy = 0` para regresar a `IDLE` (`state = 0`).
 
 ---
 
