@@ -255,7 +255,7 @@ En el testbench se configuró el parámetro CLKS_PER_BIT = 8 (con un periodo de 
    * La transmisión concluye correctamente generando de nuevo el pulso de done = 1 por 1 ciclo.
 
 
-
+j
 
 ---
 
