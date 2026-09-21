@@ -228,8 +228,32 @@ La máquina de estados finitos sigue el flujo algorítmico estructurado en los s
 ![Diagrama ASM](doc/asm_diagram.png)
 
 ### 4.3 Simulación y Análisis de Transmisión
-<!-- Imagen de GTKWave del Ejercicio 3 -->
+
+
+Para validar el funcionamiento del transmisor serial síncrono, se ejecutó la simulación en Icarus Verilog y se analizaron las formas de onda resultantes en GTKWave. 
+
+En el testbench se configuró el parámetro CLKS_PER_BIT = 8 (con un periodo de reloj de  $T_{clk} = 10\text{ ns}$) y se evaluó la transmisión secuencial de dos datos de prueba: 8'hA5 y 8'h3C (10100101 y 00111100)
+
 ![Simulación Ejercicio 3](doc/sim_ejercicio3.png)
+
+
+#### Análisis Cronológico del Comportamiento
+
+1. Inicialización y Reset:
+   * Al inicio, la señal rst se activa durante 2 ciclos. La FSM se inicializa en el estado IDLE (`state = 0`), manteniendo busy = 0, done = 0 y la línea serial en reposo (`tx = 1`).
+
+2. Transmisión 1: Dato 8'hA5 (`10100101` en binario):
+   * Carga: Al detectarse el pulso de 1 ciclo en start, el sistema conmuta brevemente a LOAD (`state = 1`), cargando shift_reg = A5 y activando busy = 1.
+   * Envío Bit a Bit (LSB Primero): 
+     * Bit 0 (`1`): tx toma el valor `1` y permanece estable durante $8 \text{ ciclos}$ ($80\text{ ns}$) impulsado por tick_cnt (conteo de `0` a `7`). Al completarse, shift_reg se desplaza a la derecha convirtiéndose en `52` y bit_count se incrementa a `1`.
+     * Bits 1 a 7: La secuencia continúa enviando los bits `0`, `1`, `0`, `0`, `1`, `0` y `1` (correspondientes al desplazamiento sucesivo en shift_reg: `52` $\rightarrow$ `29` $\rightarrow$ `14` $\rightarrow$ `0A` $\rightarrow$ `05` $\rightarrow$ `02` $\rightarrow$ `01`).
+   * Finalización: Tras transmitir los 8 bits (`bit_count == 7`), la FSM entra al estado DONE (`state = 4`), donde emite un pulso de done de exactamente 1 ciclo de reloj y desactiva busy = 0.
+
+3. Transmisión 2: Dato 8'h3C (`00111100` en binario):
+   * Tras retornar a IDLE, un nuevo pulso de start inicia la transmisión de 8'h3C.
+   * El registro se desplaza secuencialmente (`3C` $\rightarrow$ `1E` $\rightarrow$ `0F` $\rightarrow$ `07` $\rightarrow$ `03` $\rightarrow$ `01` $\rightarrow$ `00`), enviando los bits desde el LSB (`0`) hasta el MSB (`0`), manteniendo cada bit por 8 ciclos exactos de reloj.
+   * La transmisión concluye correctamente generando de nuevo el pulso de done = 1 por 1 ciclo.
+
 
 
 
