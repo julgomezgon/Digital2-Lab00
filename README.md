@@ -231,9 +231,6 @@ La máquina de estados finitos sigue el flujo algorítmico estructurado en los s
 <!-- Imagen de GTKWave del Ejercicio 3 -->
 ![Simulación Ejercicio 3](doc/sim_ejercicio3.png)
 
-### 4.3 Simulación y Análisis de Transmisión
-<!-- Imagen de GTKWave del Ejercicio 3 -->
-![Simulación Ejercicio 3](doc/sim_ejercicio3.png)
 
 
 ---
