@@ -3,7 +3,7 @@
 **Curso:** Electrónica Digital II  
 **Integrantes:**  
 * Julian David Gomez Gonzalez
-* Integrante 2 
+* Cristian Norbey Hernández Gualteros
 * Integrante 2 
 
 ---
@@ -19,16 +19,84 @@
 ## 2. Ejercicio 1: FSM de Control – Semáforo Simple
 
 ### 2.1 Descripción del Sistema
-<!-- Descripción textual del funcionamiento del semáforo -->
+
+El sistema implementa un semáforo simple mediante una **Máquina de Estados Finitos (FSM)** desarrollada en Verilog HDL.
+
+El semáforo utiliza cuatro estados para controlar la secuencia de encendido de las luces:
+
+* **S0 – GREEN:** luz verde encendida durante 5 ciclos de reloj.
+* **S1 – YELLOW:** luz amarilla encendida durante 2 ciclos de reloj.
+* **S2 – RED:** luz roja encendida durante 4 ciclos de reloj.
+* **S3 – YELLOW:** luz amarilla encendida durante 2 ciclos de reloj antes de regresar al estado verde.
+
+La secuencia de funcionamiento es:
+
+**GREEN → YELLOW → RED → YELLOW → GREEN → ...**
+
+El uso de dos estados diferentes para la luz amarilla permite representar correctamente las dos transiciones del semáforo: una después del estado verde y otra después del estado rojo.
+
+El sistema recibe dos entradas:
+
+* `clk`: señal de reloj utilizada para sincronizar el funcionamiento de la FSM.
+* `rst`: señal de reset que inicializa el sistema en el estado **GREEN (S0)**.
+
+Las salidas son:
+
+* `green`: controla la luz verde.
+* `yellow`: controla la luz amarilla.
+* `red`: controla la luz roja.
+
+Para controlar la duración de cada estado se utiliza un contador interno que cuenta los ciclos de reloj. Cuando se alcanza el número de ciclos correspondiente al estado actual, la FSM realiza la transición al siguiente estado y el contador vuelve a cero.
 
 ### 2.2 Diagrama de Estados (FSM)
-<!-- Diagrama conceptual o tabla de transición de estados -->
+
+![Diagrama FSM Semáforo](doc/fsm_semaforo.jpeg)
+
+El diagrama representa los cuatro estados de la FSM y las transiciones entre ellos.
+
+La duración de cada estado se indica en las transiciones:
+
+* **S0 → S1:** después de 5 ciclos.
+* **S1 → S2:** después de 2 ciclos.
+* **S2 → S3:** después de 4 ciclos.
+* **S3 → S0:** después de 2 ciclos.
+
+El estado inicial después de activar el reset es **S0 (GREEN)**.
 
 ### 2.3 Simulación y Análisis de Resultados
-<!-- Imagen de GTKWave del Ejercicio 1 -->
-![Simulación Ejercicio 1](doc/sim_ejercicio1.png)
 
-<!-- Análisis de las formas de onda y tiempos del semáforo -->
+![Simulación Ejercicio 1](doc/sim_ejercicio1.jpeg)
+
+La simulación se realizó utilizando **Icarus Verilog** como simulador y **GTKWave** para visualizar las formas de onda. Durante la prueba se generó el archivo `semaforo.vcd`.
+
+La señal `clk` presenta un período de **10 ns**, generado mediante:
+
+```verilog
+always #5 clk = ~clk;
+```
+
+Por lo tanto, la FSM actualiza su estado en cada flanco ascendente del reloj.
+
+Al inicio de la simulación, la señal `rst` se encuentra activa y la FSM se mantiene en el estado **S0**, correspondiente a la luz verde. Al liberar el reset, comienza el conteo de ciclos.
+
+El comportamiento observado en la simulación es:
+
+| Estado | Salida activa | Duración |
+| ------ | ------------- | -------: |
+| S0     | GREEN         | 5 ciclos |
+| S1     | YELLOW        | 2 ciclos |
+| S2     | RED           | 4 ciclos |
+| S3     | YELLOW        | 2 ciclos |
+
+La secuencia observada en GTKWave es:
+
+**GREEN → YELLOW → RED → YELLOW → GREEN**
+
+y posteriormente vuelve a repetirse.
+
+El contador interno permite verificar la duración de cada estado. Por ejemplo, mientras la FSM se encuentra en **S2**, la señal `red` permanece en `1` mientras el contador avanza hasta completar los 4 ciclos correspondientes. Al alcanzar el límite, la FSM cambia al estado **S3**, `red` pasa a `0` y `yellow` pasa a `1`.
+
+De esta manera, la simulación confirma que la FSM realiza correctamente las transiciones programadas y que solamente una de las tres luces permanece activa en cada estado.
 
 ---
 
