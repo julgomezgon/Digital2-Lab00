@@ -190,14 +190,46 @@ Síncrono
 
 
 ---
-
 ## 4. Ejercicio 3: Máquina ASM – Transmisor Serial Síncrono (Bono)
 
-### 4.1 Descripción del Módulo y Datapath
-<!-- Explicación de la ASM, registros y temporizador CLKS_PER_BIT -->
+### 4.1 Descripción de la Arquitectura y Datapath
+
+El diseño consiste en un transmisor serial síncrono de 8 bits implementado mediante una Máquina de Estados Algorítmica (ASM) completa. La arquitectura integra la Unidad de Control (FSM de 5 estados) y el Datapath (registros y contadores) para gestionar la captura de datos en paralelo y su posterior transmisión serial.
+
+#### Componentes Internos (Datapath y Control)
+* **Registro de Desplazamiento (`shift_reg` - 8 bits):** Almacena el dato de entrada `data_in` e interactúa desplazando su contenido a la derecha (`shift_reg >> 1`) para entregar el bit menos significativo (LSB) a la salida serial.
+* **Contador de Bits (`bit_count` - 3 bits):** Lleva el seguimiento numérico de los bits transmitidos (de 0 a 7).
+* **Temporizador de Ancho de Bit (`tick_cnt` - `$clog2(CLKS_PER_BIT)` bits):** Cuenta los ciclos de reloj para mantener la señal `tx` estable durante el tiempo definido por el parámetro `CLKS_PER_BIT`.
+* **Registro de Estado (`state` - 3 bits):** Almacena el estado actual de la FSM para coordinar las operaciones del datapath.
+
+#### Entradas del Sistema
+* `clk`: Reloj principal del sistema.
+* `rst`: Reset síncrono para inicializar el sistema a su estado de reposo.
+* `start`: Pulso de inicio de transmisión (1 ciclo de reloj de duración).
+* `data_in[7:0]`: Byte de datos recibido en paralelo para ser transmitido.
+
+#### Salidas del Sistema
+* `tx`: Línea de salida serial (se mantiene en nivel alto `1` en estado de reposo).
+* `busy`: Indicador de estado que permanece activo (`1`) durante todo el proceso de transmisión.
+* `done`: Pulso de 1 ciclo de reloj que notifica la finalización exitosa de la transmisión.
+
+---
 
 ### 4.2 Diagrama de la ASM
-<!-- Diagrama de la ASM o flujo de estados -->
+
+La máquina de estados finitos sigue el flujo algorítmico estructurado en los siguientes 5 estados:
+
+1. **`S0: IDLE`:** La línea `tx` permanece en alto (`1`) y `busy = 0`. Al recibir un pulso en `start = 1`, la FSM transiciona a `LOAD`.
+2. **`S1: LOAD`:** Se carga el byte `data_in` en `shift_reg`, se reinician los contadores `bit_count` y `tick_cnt`, y se activa `busy = 1`.
+3. **`S2: BIT_HOLD`:** Mantiene el bit actual en la línea `tx` (`shift_reg[0]`) e incrementa `tick_cnt`. Permanece en este estado hasta que `tick_cnt == CLKS_PER_BIT - 1`.
+4. **`S3: SHIFT_NEXT`:** Evalúa si se han transmitido los 8 bits (`bit_count == 7`). Si faltan bits, desplaza `shift_reg` a la derecha, incrementa `bit_count`, reinicia `tick_cnt = 0` y retorna a `BIT_HOLD`. Si ya finalizó, pasa a `DONE`.
+5. **`S4: DONE`:** Emite el pulso de finalización `done = 1` por 1 ciclo de reloj, desactiva `busy = 0`, restituye `tx = 1` y retorna a `IDLE`.
+
+![Diagrama ASM](doc/asm_diagram.png)
+
+### 4.3 Simulación y Análisis de Transmisión
+<!-- Imagen de GTKWave del Ejercicio 3 -->
+![Simulación Ejercicio 3](doc/sim_ejercicio3.png)
 
 ### 4.3 Simulación y Análisis de Transmisión
 <!-- Imagen de GTKWave del Ejercicio 3 -->
