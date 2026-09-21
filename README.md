@@ -247,8 +247,8 @@ En el testbench se configuró el parámetro CLKS_PER_BIT = 8 (con un periodo de 
      
    * Envío Bit a Bit (LSB Primero): 
      * Primer Bit (`1`): tx toma el valor `1` y permanece estable durante $8 \text{ ciclos}$ ($80\text{ ns}$)  por tick_cnt (conteo de `0` a `7`). Al completarse, shift_reg se desplaza a la derecha convirtiéndose en `01010010` y bit_count se incrementa a `1`.
-     * Bits 1 a 7: La secuencia continúa enviando los bits `0`, `1`, `0`, `0`, `1`, `0` y `1` (correspondientes al desplazamiento sucesivo en shift_reg: `01010010` $\rightarrow$ `00101001` $\rightarrow$ `00010100` $\rightarrow$ `00001010` $\rightarrow$ `00000101` $\rightarrow$ `00000010` $\rightarrow$ `00000001`).
-     * 
+     * Bits 1 a 7: La secuencia continúa enviando los bits `0`, `1`, `0`, `0`, `1`, `0` y `1` correspondientes al desplazamiento sucesivo en shift_reg: `01010010` $\rightarrow$ `00101001` $\rightarrow$ `00010100` $\rightarrow$ `00001010` $\rightarrow$ `00000101` $\rightarrow$ `00000010` $\rightarrow$ `00000001`.
+       
    * Finalización: Tras transmitir los 8 bits (`bit_count == 7`), la FSM entra al estado DONE (`state = 4`), donde emite un pulso de done de exactamente 1 ciclo de reloj y desactiva busy = 0.
 
 3. Transmisión 2: Dato `00111100`:
